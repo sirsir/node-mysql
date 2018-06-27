@@ -9,8 +9,7 @@ const config = {
   multipleStatements: true
 }
 
-// var connectionOld = mysql.createConnection(config)
-
+// === Wrapper to use mysql with Promise
 class Database {
     constructor( config ) {
         this.connection = mysql.createConnection( config );
@@ -35,7 +34,6 @@ class Database {
     }
 }
  
- // connection.connect();
 const connection = new Database(config)
 
 const data={
@@ -466,28 +464,6 @@ const task={
       console.log('The solution is: ', results[0].solution);
     })
   },
-  getNoTagsOld: function(){
-    let tags =  data.tag2
-
-    let no_tags=[]
-    let counter=0
-    tags.forEach(tag=>{
-      connection.query(`SELECT * FROM tags WHERE name='${tag}'`, function (error, results, fields) {
-        if (error) throw error;
-        counter++;
-        if (results.length===0){
-          no_tags.push(tag)
-        }else{
-          console.log(`Exists: ${tag}`)
-        }
-        if (counter >= tags.length ){
-          console.log(no_tags);
-          task.insertTags(no_tags)
-        }
-        
-      });
-    })
-  },
   joinTags4SQL: function (tags){
     str = tags.map(tag=>`'${tag}'`)
     .join(',')
@@ -526,64 +502,6 @@ const task={
       console.log(err)
     )      
   },
-  insertTagsOld: function(tags){
-    let counter = 0
-    tags.forEach(tag=>{
-      // console.log(tag)
-      var query = connection.query(`INSERT INTO tags (name,created_at,updated_at,parent_id) VALUES ('${tag}',NOW(),NOW(),0)`, function (error, results, fields) {
-        if (error) {
-          return connection.rollback(function() {
-            throw error;
-          });
-        }
-        connection.commit(function(err) {
-          if (err) {
-            return connection.rollback(function() {
-              throw err;
-            });
-          }
-          counter++;
-          console.log(`Insert ${tag}`);
-          if (counter >= tags.length ){
-            console.log('Finish insert into table');
-            
-          }
-          console.log('success!');
-        });
-        
-      })
-      console.log(query.sql)
-    })    
-  },
-  insertTagsMappingOld: function(){
-    let mappings = task.mappingFromCern()
-    let counter=0
-    mappings.forEach(mapping=>{
-      var query = connection.query(`INSERT INTO tag_mappings (tag_name,tag_id,created_at,updated_at) VALUES ('${mapping.word}',(SELECT id FROM tags WHERE name='${mapping.words[0]}'),NOW(),NOW())`, function (error, results, fields) {
-        if (error) {
-          return connection.rollback(function() {
-            throw error;
-          });
-        }
-        connection.commit(function(err) {
-          if (err) {
-            return connection.rollback(function() {
-              throw err;
-            });
-          }
-          counter++;
-          // console.log(`Insert ${tag}`);
-          if (counter >= tags.length ){
-            console.log('Finish insert into table');
-            
-          }
-          console.log('success!');
-        });
-        
-      })
-      console.log(query.sql)
-    })    
-  },
   insertTagsMapping: function(){
     let mappings = data.mappingFromCern
     
@@ -603,8 +521,11 @@ const task={
   },
 }
  
+// === Select One ===
 // task.insertTags();
 task.insertTagsMapping();
+
+// === End Select ===
  
 // connection.end();
 
