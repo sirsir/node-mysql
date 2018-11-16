@@ -5,11 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "findKeywords": "node scripts/findKeywords.js",
+    "findKeywordsPureSql": "node scripts/findKeywordsSqlPlusJs.js",
+    "checkMatchingAmivoiceAutocallCti": "node scripts/checkMatchingAmivoiceAutocallCti.js"
+    
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "mysql": "^2.15.0"
+  },
+  "devDependencies": {
+    "clipboardy": "^1.2.3",
+    "event-stream": "^3.3.4"
   }
 }
